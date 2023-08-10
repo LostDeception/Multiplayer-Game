@@ -2,63 +2,58 @@ const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
 const socket = io();
-
 const scoreEl = document.querySelector('#scoreEl')
-
 const devicePixelRatio = window.devicePixelRatio || 1;
 
 canvas.width = 1024 * devicePixelRatio;
 canvas.height = 576 * devicePixelRatio;
 c.scale(devicePixelRatio, devicePixelRatio);
-
 const x = canvas.width / 2
 const y = canvas.height / 2
 
-//const player = new Player(x, y, 10, 'white');
 const frontEndPlayers = {};
 const frontEndProjectiles = {};
+
+var MOUSE_POS = {
+  x: 0,
+  y: 0,
+  angle: 0 // angle from player to mouse in radians
+}
+
+const PROJECTILE_RADIUS = 5;
+
+// delete frontend player object
+socket.on('respawn', (playerId) => {
+  delete frontEndPlayers[playerId];
+})
 
 socket.on('updatePlayers', (backEndPlayers) => {
   for(const id in backEndPlayers) {
     const backEndPlayer = backEndPlayers[id];
 
+    // if player has not been added or is respawning
     if(!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({
+        id,
         x: backEndPlayer.x, 
         y: backEndPlayer.y, 
-        radius: 15, 
+        radius: 15,
+        aimAngle: 0, 
         color: backEndPlayer.color,
-        username: backEndPlayer.username
+        username: backEndPlayer.username,
+        weapon: new Weapon(1)
       })
 
-      // Add player to leaderboard
-      document.querySelector('#leaderboardPlayers').innerHTML += `<li data-id="${id}" data-score="${backEndPlayer.score}">${backEndPlayer.username}: ${backEndPlayer.score}</li>`
+      if(!document.querySelector(`li[data-id="${id}"]`)) {
+        document.querySelector('#leaderboardPlayers').innerHTML += `<li data-id="${id}" data-score="${backEndPlayer.level}">${backEndPlayer.username}: ${backEndPlayer.level}</li>`
+      }
 
     } else {
 
-      // Update player score to leaderboard
-      document.querySelector(`li[data-id="${id}"]`).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`;
-      document.querySelector(`li[data-id="${id}"]`).setAttribute('data-score', backEndPlayer.score);
+      // update player aim 
+      frontEndPlayers[id].aimAngle = backEndPlayer.aimAngle;
 
-      // sorts the player leaderboard list
-      const leaderboardList = document.querySelector('#leaderboardPlayers');
-      const listItems = Array.from(leaderboardList.querySelectorAll('li'));
-      listItems.sort((a, b) => {
-        const scoreA = Number(a.getAttribute('data-score'));
-        const scoreB = Number(b.getAttribute('data-score'));
-        return scoreB - scoreA;
-      })
-
-      // Remove old elements
-      listItems.forEach((li) => {
-        leaderboardList.removeChild(li);
-      })
-
-      // Add sorted elements
-      listItems.forEach((li) => {
-        leaderboardList.appendChild(li);
-      })
-
+      // set target for interpolation
       frontEndPlayers[id].target = {
         x: backEndPlayer.x,
         y: backEndPlayer.y,
@@ -80,6 +75,29 @@ socket.on('updatePlayers', (backEndPlayers) => {
           frontEndPlayers[id].target.y += input.dy;
         })
       }
+
+      // Update player score to leaderboard
+      document.querySelector(`li[data-id="${id}"]`).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.level}`;
+      document.querySelector(`li[data-id="${id}"]`).setAttribute('data-score', backEndPlayer.level);
+
+      // sorts the player leaderboard list
+      const leaderboardList = document.querySelector('#leaderboardPlayers');
+      const listItems = Array.from(leaderboardList.querySelectorAll('li'));
+      listItems.sort((a, b) => {
+        const scoreA = Number(a.getAttribute('data-score'));
+        const scoreB = Number(b.getAttribute('data-score'));
+        return scoreB - scoreA;
+      })
+
+      // Remove old elements
+      listItems.forEach((li) => {
+        leaderboardList.removeChild(li);
+      })
+
+      // Add sorted elements
+      listItems.forEach((li) => {
+        leaderboardList.appendChild(li);
+      })
     }
   }
 
@@ -101,7 +119,7 @@ socket.on('updateProjectiles', (backendProjectiles) => {
       frontEndProjectiles[id] = new Projectile({
         x: backEndProjectile.x,
         y: backEndProjectile.y, 
-        radius: 5, 
+        radius: PROJECTILE_RADIUS, 
         color: frontEndPlayers[backEndProjectile.playerId]?.color, 
         velocity: backEndProjectile.velocity
       })
@@ -119,7 +137,6 @@ socket.on('updateProjectiles', (backendProjectiles) => {
 })
 
 const projectiles = []
-//const enemies = []
 const particles = []
 
 
@@ -168,6 +185,10 @@ setInterval(() => {
     frontEndPlayers[socket.id].x += SPEED;
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber });
   }
+
+  // send player angle to backend
+  socket.emit('aim', MOUSE_POS.angle);
+
 }, 15);
 
 window.addEventListener('keydown', (e) => {
@@ -240,9 +261,6 @@ function animate() {
     const frontEndProjectile = frontEndProjectiles[id];
     frontEndProjectile.draw();
   }
-
-
-
 
   for (let index = particles.length - 1; index >= 0; index--) {
     const particle = particles[index]

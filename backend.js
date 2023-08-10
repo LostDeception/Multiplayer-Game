@@ -15,6 +15,7 @@ const PLAYER_RADIUS = 10;
 // (REMINDER) ---> Radius and Falloff need to be attributes for currently active weapon when created!!!
 const PROJECTILE_RADIUS = 5;
 const PROJECTILE_FALLOFF = 500;
+const PROJECTILE_SPEED = 10;
 
 app.use(express.static('public'))
 
@@ -32,39 +33,41 @@ let projectileId = 0;
 io.on('connection', (socket) => {
   console.log('a user connected');
   io.emit('updatePlayers', backEndPlayers);
-
-  socket.on('initCanvas', ({width, height, devicePixelRatio}) => {
-    
-  })
   
   socket.on('shoot', ({x, y, angle}) => {
     projectileId++;
 
     const velocity = {
-      x: Math.cos(angle) * 5,
-      y: Math.sin(angle) * 5
+      x: Math.cos(angle) * PROJECTILE_SPEED,
+      y: Math.sin(angle) * PROJECTILE_SPEED
     }
 
     backEndProjectiles[projectileId] = {
       x, 
-      y, 
+      y,
       startX: x, // holds firing position (does not update throughout life of projectile) 
       startY: y, // holds firing position (does not update throughout life of projectile) 
-      velocity, 
+      velocity,
       playerId: socket.id
     }
+  })
+
+  socket.on('aim', (angle) => {
+    if(backEndPlayers[socket.id])
+      backEndPlayers[socket.id].aimAngle = angle;
   })
 
   socket.on('initGame', ({username, width, height}) => {
 
     // create unique player id/object (id matches the socket id)
     backEndPlayers[socket.id] = {
-      x: 1024 * Math.random(), 
+      x: 1024 * Math.random(),
       y: 576 * Math.random(),
+      aimAngle: 0,
       color: `hsl(${360 * Math.random()}, 100%, 50%)`, // generate a random number
       sequenceNumber: 0,
-      score: 0,
-      username
+      username,
+      level: 1
     }
 
 
@@ -158,15 +161,19 @@ setInterval(() => {
       )
 
       if(DISTANCE < PROJECTILE_RADIUS + PLAYER_RADIUS && 
-        backEndProjectiles[id].playerId !== playerId) {
+        playerID !== playerId) {
 
         // Player has been hit by projectile
-        if(backEndPlayers[backEndProjectiles[id].playerId]) {
-          backEndPlayers[backEndProjectiles[id].playerId].score++;
+        if(backEndPlayers[playerID]) {
+          backEndPlayers[playerID].level++;
         }
 
-        delete backEndProjectiles[id]
-        delete backEndPlayers[playerId]
+        backEndPlayers[playerId].x = 1024 * Math.random();
+        backEndPlayers[playerId].y = 576 * Math.random();
+        io.emit('respawn', playerId);
+
+        //delete backEndProjectiles[id]
+        //delete backEndPlayers[playerId]
         break;
       }
     }
