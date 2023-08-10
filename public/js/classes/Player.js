@@ -15,7 +15,7 @@ class Player {
     c.arc(
     this.x, 
     this.y, 
-    this.radius * window.devicePixelRatio, 
+    this.radius, 
     0, 
     Math.PI * 2, 
     false)

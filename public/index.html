@@ -4,28 +4,29 @@
     <script src="https://kit.fontawesome.com/45ff824e5e.js" crossorigin="anonymous"></script>
   </head>
   <body>
-
-    <!-- player leaderboard -->
-    <div id="leaderboard">
-      <i class="fa-solid fa-medal fa-2xs" style="color: #feda58;"> Leaderboard</i>
-      <ul id="leaderboardPlayers"></ul>
-    </div>
-
-    <!-- canvas to display game -->
-    <canvas></canvas>
-
-    <!-- username input -->
-    <div id="initFormContainer">
-      <form id="usernameForm">
-        <div>
-          <input id="usernameInput" type="text" placeholder="Username"/>
+    <div>
+        <!-- player leaderboard -->
+        <div id="leaderboard">
+          <i class="fa-solid fa-medal fa-2xs" style="color: #feda58;"> Leaderboard</i>
+          <ul id="leaderboardPlayers"></ul>
         </div>
-        <div style="text-align: center; margin-top: 8px">
-          <button id="btnStart">Start!</button>
+
+        <!-- canvas to display game -->
+        <canvas></canvas>
+
+        <!-- username input -->
+        <div id="initFormContainer">
+          <form id="usernameForm">
+            <div>
+              <input id="usernameInput" type="text" placeholder="Username"/>
+            </div>
+            <div style="text-align: center; margin-top: 8px">
+              <button id="btnStart">Start!</button>
+            </div>
+          </form>
         </div>
-      </form>
+        <!-- username input end -->
     </div>
-    <!-- username input end -->
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"

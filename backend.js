@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
     }
   })
 
-  socket.on('initGame', ({username, width, height, devicePixelRatio}) => {
+  socket.on('initGame', ({username, width, height}) => {
 
     // create unique player id/object (id matches the socket id)
     backEndPlayers[socket.id] = {
@@ -75,9 +75,6 @@ io.on('connection', (socket) => {
     }
 
     backEndPlayers[socket.id].radius = PLAYER_RADIUS;
-    if(devicePixelRatio > 1) {
-      backEndPlayers[socket.id].radius = 2 * PLAYER_RADIUS;
-    }
   })
 
   // when player disconnects remove from players object in backend
