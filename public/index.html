@@ -15,28 +15,17 @@
     <canvas></canvas>
 
     <!-- username input -->
-<div
-style="
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-"
->
-<form id="usernameForm">
-  <div>
-    <input id="usernameInput" type="text" placeholder="Username"/>
-  </div>
-  <div style="text-align: center; margin-top: 8px">
-    <button id="btnStart">Start!</button>
-  </div>
-</form>
-</div>
-<!-- username input end -->
+    <div id="initFormContainer">
+      <form id="usernameForm">
+        <div>
+          <input id="usernameInput" type="text" placeholder="Username"/>
+        </div>
+        <div style="text-align: center; margin-top: 8px">
+          <button id="btnStart">Start!</button>
+        </div>
+      </form>
+    </div>
+    <!-- username input end -->
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
