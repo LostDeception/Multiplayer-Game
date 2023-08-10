@@ -21,9 +21,14 @@ var MOUSE_POS = {
 }
 
 const PROJECTILE_RADIUS = 5;
+const PLAYER_HEALTH = 60;
 
 // delete frontend player object
-socket.on('respawn', (playerId) => {
+socket.on('playerHit', (playerId, attackerId) => {
+  delete frontEndProjectiles[attackerId];
+})
+
+socket.on('respawn', (playerId, attackerId) => {
   delete frontEndPlayers[playerId];
 })
 
@@ -38,12 +43,14 @@ socket.on('updatePlayers', (backEndPlayers) => {
         x: backEndPlayer.x, 
         y: backEndPlayer.y, 
         radius: 15,
+        health: backEndPlayer.health,
         aimAngle: 0, 
         color: backEndPlayer.color,
         username: backEndPlayer.username,
         weapon: new Weapon(1)
       })
 
+      // if player has not yet been added to leaderboard
       if(!document.querySelector(`li[data-id="${id}"]`)) {
         document.querySelector('#leaderboardPlayers').innerHTML += `<li data-id="${id}" data-score="${backEndPlayer.level}">${backEndPlayer.username}: ${backEndPlayer.level}</li>`
       }
@@ -52,6 +59,9 @@ socket.on('updatePlayers', (backEndPlayers) => {
 
       // update player aim 
       frontEndPlayers[id].aimAngle = backEndPlayer.aimAngle;
+
+      // update player health
+      frontEndPlayers[id].health = backEndPlayer.health;
 
       // set target for interpolation
       frontEndPlayers[id].target = {

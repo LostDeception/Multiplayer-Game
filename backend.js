@@ -28,6 +28,7 @@ const backEndProjectiles = {}
 
 
 const SPEED = 3;
+const PLAYER_HEALTH = 60;
 let projectileId = 0;
 
 io.on('connection', (socket) => {
@@ -64,6 +65,7 @@ io.on('connection', (socket) => {
       x: 1024 * Math.random(),
       y: 576 * Math.random(),
       aimAngle: 0,
+      health: PLAYER_HEALTH, // player default health
       color: `hsl(${360 * Math.random()}, 100%, 50%)`, // generate a random number
       sequenceNumber: 0,
       username,
@@ -138,7 +140,7 @@ setInterval(() => {
     backEndProjectiles[id].x += backEndProjectiles[id].velocity.x;
     backEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
 
-    let playerID = backEndProjectiles[id].playerId;
+    let attackerID = backEndProjectiles[id].playerId;
     if(
 
       // Handle projectile disposal on the X axis
@@ -160,20 +162,26 @@ setInterval(() => {
         backEndProjectiles[id].y - backEndPlayer.y
       )
 
+      // Player has been hit by projectile
       if(DISTANCE < PROJECTILE_RADIUS + PLAYER_RADIUS && 
-        playerID !== playerId) {
+        attackerID !== playerId) {
 
-        // Player has been hit by projectile
-        if(backEndPlayers[playerID]) {
-          backEndPlayers[playerID].level++;
+        if(backEndPlayers[attackerID]) {
+          backEndPlayers[attackerID].level++;
         }
 
-        backEndPlayers[playerId].x = 1024 * Math.random();
-        backEndPlayers[playerId].y = 576 * Math.random();
-        io.emit('respawn', playerId);
+        // if player health is at or below 0
+        if(backEndPlayer.health <= 0) {
+          backEndPlayers[playerId].x = 1024 * Math.random();
+          backEndPlayers[playerId].y = 576 * Math.random();
+          backEndPlayers[playerId].health = PLAYER_HEALTH;
+          io.emit('respawn', { playerId, attackerID });
+        } else {
+          delete backEndProjectiles[id];
+          backEndPlayers[playerId].health -= 1; // reduce player health by 1 hit point
+          io.emit('playerHit', { playerId, attackerID });
+        }
 
-        //delete backEndProjectiles[id]
-        //delete backEndPlayers[playerId]
         break;
       }
     }

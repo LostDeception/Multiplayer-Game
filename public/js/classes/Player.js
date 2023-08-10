@@ -15,9 +15,13 @@ class Player {
     c.fillStyle = this.color
     c.fillText(this.username, this.x, this.y + 30)
 
+    // draw player healthbar
+    this.draw_healthbar(this.x + 25, this.y + 35, frontEndPlayers[this.id].health, 50, 5);
+
     c.save();
     c.shadowColor = this.color;
     c.shadowBlur = 10;
+    
 
     // create body
     c.beginPath()
@@ -31,8 +35,10 @@ class Player {
     false)
    
     c.fillStyle = this.color
+    c.closePath();
     c.fill()
 
+    // draw weapon on player at mouse rotation
     var weapon = frontEndPlayers[this.id].weapon.CurrentLevel();
     var weaponImage = weapon.standardImage();
     var weaponWidth = weapon.width;
@@ -56,8 +62,24 @@ class Player {
       drawImgY += weapon.altPosY;
     }
 
-
+    // draw player weapon
     c.drawImage(weaponImage, drawImgX, drawImgY, weaponWidth, weaponHeight);
     c.restore();
+  }
+
+  draw_healthbar(x, y, per, width, thickness) {
+    c.beginPath();
+    c.rect(x - width / 2, y, width * (per / 100), thickness);
+    if(per > 50){
+        c.fillStyle="rgba(9, 213, 60, 0.66)"
+    }else if(per > 25){
+        c.fillStyle="gold"
+    }else if(per > 13){
+      c.fillStyle="orange";
+    }else{
+      c.fillStyle="red";
+    }
+    c.closePath();
+    c.fill();
   }
 }
