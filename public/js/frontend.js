@@ -27,7 +27,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         x: backEndPlayer.x, 
         y: backEndPlayer.y, 
         radius: 15, 
-        color: backEndPlayer.color
+        color: backEndPlayer.color,
+        username: backEndPlayer.username
       })
 
       // Add player to leaderboard
@@ -58,10 +59,12 @@ socket.on('updatePlayers', (backEndPlayers) => {
         leaderboardList.appendChild(li);
       })
 
+      frontEndPlayers[id].target = {
+        x: backEndPlayer.x,
+        y: backEndPlayer.y,
+      }
+
       if(id === socket.id) {
-        // if player already exists
-        frontEndPlayers[id].x = backEndPlayer.x;
-        frontEndPlayers[id].y = backEndPlayer.y;
 
         // use Server Reconciliation to fix any lag issues for player
         const lastBackendInputIndex = playerInputs.findIndex(input => {
@@ -73,16 +76,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         }
         
         playerInputs.forEach(input => {
-          frontEndPlayers[id].x += input.dx;
-          frontEndPlayers[id].y += input.dy;
-        })
-      } else {
-        // for all other players (Player Interpolation using GSAP)
-        gsap.to(frontEndPlayers[id], {
-          x: backEndPlayer.x,
-          y: backEndPlayer.y,
-          duration: 0.015,
-          ease: 'linear'
+          frontEndPlayers[id].target.x += input.dx;
+          frontEndPlayers[id].target.y += input.dy;
         })
       }
     }
@@ -145,7 +140,7 @@ const keys = {
   }
 }
 
-const SPEED = 5;
+const SPEED = 3;
 const playerInputs = [];
 let sequenceNumber = 0;
 setInterval(() => {
@@ -227,11 +222,17 @@ let animationId
 //let score = 0
 function animate() {
   animationId = requestAnimationFrame(animate)
-  c.fillStyle = 'rgba(0, 0, 0, 0.1)'
-  c.fillRect(0, 0, canvas.width, canvas.height);
+  c.clearRect(0, 0, canvas.width, canvas.height);
 
   for(const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
+
+    // linear interpolation
+    if(frontEndPlayer.target) {
+      frontEndPlayers[id].x += (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5;
+      frontEndPlayers[id].y += (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
+    }
+
     frontEndPlayer.draw();
   }
 
@@ -268,69 +269,9 @@ function animate() {
       projectiles.splice(index, 1)
     }
   }
-
-  /*
-  for (let index = enemies.length - 1; index >= 0; index--) {
-    const enemy = enemies[index]
-
-    enemy.update()
-
-    const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
-
-    //end game
-    if (dist - enemy.radius - player.radius < 1) {
-      cancelAnimationFrame(animationId)
-    }
-
-    for (
-      let projectilesIndex = projectiles.length - 1;
-      projectilesIndex >= 0;
-      projectilesIndex--
-    ) {
-      const projectile = projectiles[projectilesIndex]
-
-      const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
-
-      // when projectiles touch enemy
-      if (dist - enemy.radius - projectile.radius < 1) {
-        // create explosions
-        for (let i = 0; i < enemy.radius * 2; i++) {
-          particles.push(
-            new Particle(
-              projectile.x,
-              projectile.y,
-              Math.random() * 2,
-              //enemy.color,
-              {
-                x: (Math.random() - 0.5) * (Math.random() * 6),
-                y: (Math.random() - 0.5) * (Math.random() * 6)
-              }
-            )
-          )
-        }
-        // this is where we shrink our enemy
-        if (enemy.radius - 10 > 5) {
-          score += 100
-          scoreEl.innerHTML = score
-          gsap.to(enemy, {
-            radius: enemy.radius - 10
-          })
-          projectiles.splice(projectilesIndex, 1)
-        } else {
-          // remove enemy if they are too small
-          score += 150
-          scoreEl.innerHTML = score
-
-          enemies.splice(index, 1)
-          projectiles.splice(projectilesIndex, 1)
-        }
-      }
-    }
-  }*/
 }
 
 animate()
-//spawnEnemies()
 
 function generateImage(src) {
   var img = new Image();

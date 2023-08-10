@@ -17,6 +17,9 @@ input::placeholder {
 canvas {
     width: 1024px;
     height: 576px;
+    background-image: url('./resources/footer_lodyas.png');
+    border: 3px solid rgb(29, 29, 29);
+    border-radius: 5px;
 }
 
 #leaderboard {
