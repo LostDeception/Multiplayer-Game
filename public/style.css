@@ -1,0 +1,59 @@
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    margin: 0;
+}
+
+
+input::placeholder {
+    color: #94a3b8;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+#leaderboard {
+    width: 100px;
+    height: 125px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-bottom-right-radius: 10px;
+    user-select: none;
+}
+#leaderboard i {
+    margin: 10px 0px 0px 5px;
+    color: gold;
+}
+#leaderboard ul {
+    margin: 10px 0 0 0;
+    padding: 5px 0px 0px 5px;
+    color: white;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+/* Username & Start */
+#usernameInput {
+    padding: 12px;
+    border-radius: 20px;
+    border: none;
+    background: #475569;
+    color: #cbd5e1;
+}
+#btnStart {
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: none;
+    background-image: linear-gradient(
+        to right,
+        rgb(6, 182, 212),
+        rgb(59, 130, 246)
+    );
+    color: white;
+    cursor: pointer;
+}

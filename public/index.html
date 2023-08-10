@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://kit.fontawesome.com/45ff824e5e.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+
+    <!-- player leaderboard -->
+    <div id="leaderboard">
+      <i class="fa-solid fa-medal fa-2xs" style="color: #feda58;"> Leaderboard</i>
+      <ul id="leaderboardPlayers"></ul>
+    </div>
+
+    <!-- canvas to display game -->
+    <canvas></canvas>
+
+    <!-- username input -->
+<div
+style="
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+"
+>
+<form id="usernameForm">
+  <div>
+    <input id="usernameInput" type="text" placeholder="Username"/>
+  </div>
+  <div style="text-align: center; margin-top: 8px">
+    <button id="btnStart">Start!</button>
+  </div>
+</form>
+</div>
+<!-- username input end -->
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
+      integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="./js/classes/Enemy.js"></script>
+    <script src="./js/classes/Player.js"></script>
+    <script src="./js/classes/Particle.js"></script>
+    <script src="./js/classes/Projectile.js"></script>
+    <script src="./js/frontend.js"></script>
+    <script src="./js/eventListeners.js"></script>
+  </body>
+</html>
