@@ -23,11 +23,12 @@ var MOUSE_POS = {
 const PROJECTILE_RADIUS = 5;
 const PLAYER_HEALTH = 60;
 
-// delete frontend player object
+// attacker hits player object
 socket.on('playerHit', (playerId, attackerId) => {
   delete frontEndProjectiles[attackerId];
 })
 
+// player respawn
 socket.on('respawn', (playerId, attackerId) => {
   delete frontEndPlayers[playerId];
 })
@@ -47,7 +48,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         aimAngle: 0, 
         color: backEndPlayer.color,
         username: backEndPlayer.username,
-        weapon: new Weapon(1)
+        level: backEndPlayer.level,
+        weapon: backEndPlayer.weapon
       })
 
       // if player has not yet been added to leaderboard
@@ -62,6 +64,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
 
       // update player health
       frontEndPlayers[id].health = backEndPlayer.health;
+
+      // update player level
+      frontEndPlayers[id].level = backEndPlayer.level;
+
 
       // set target for interpolation
       frontEndPlayers[id].target = {
@@ -250,7 +256,6 @@ document.querySelector('#usernameForm').addEventListener('submit', (e) => {
 
 
 let animationId
-//let score = 0
 function animate() {
   animationId = requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height);
@@ -305,4 +310,9 @@ function generateImage(src) {
   var img = new Image();
   img.src = src;
   return img;
+}
+
+function getWeaponLevel(id) {
+  let level = frontEndPlayers[id].level;
+  return frontEndPlayers[id].weapon[level];
 }

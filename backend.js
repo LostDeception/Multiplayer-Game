@@ -29,6 +29,7 @@ const backEndProjectiles = {}
 
 const SPEED = 3;
 const PLAYER_HEALTH = 60;
+const PLAYER_DAMAGE = 2;
 let projectileId = 0;
 
 io.on('connection', (socket) => {
@@ -69,7 +70,26 @@ io.on('connection', (socket) => {
       color: `hsl(${360 * Math.random()}, 100%, 50%)`, // generate a random number
       sequenceNumber: 0,
       username,
-      level: 1
+      level: 1,
+      weapon: {
+        1: {
+          name: 'assault_rifle1',
+          standardImage: '/resources/assault1.png',
+          flippedImage: '/resources/assault1_flipped.png',
+          altPosX: 0,
+          altPosY: 10,
+          damage: 2
+      },
+      2: {
+          name: 'assault_rifle2',
+          standardImage: '/resources/assault2.png',
+          flippedImage: '/resources/assault2_flipped.png',
+          altPosX: 0,
+          altPosY: 5,
+          damage: 2.5,
+          radius: 5
+        }
+      }
     }
 
 
@@ -166,19 +186,22 @@ setInterval(() => {
       if(DISTANCE < PROJECTILE_RADIUS + PLAYER_RADIUS && 
         attackerID !== playerId) {
 
-        if(backEndPlayers[attackerID]) {
-          backEndPlayers[attackerID].level++;
-        }
-
         // if player health is at or below 0
         if(backEndPlayer.health <= 0) {
+
+          // update attackers level by 1
+          if(backEndPlayers[attackerID]) {
+            if(backEndPlayers[attackerID].level < 2)
+              backEndPlayers[attackerID].level++;
+          }
+
           backEndPlayers[playerId].x = 1024 * Math.random();
           backEndPlayers[playerId].y = 576 * Math.random();
           backEndPlayers[playerId].health = PLAYER_HEALTH;
           io.emit('respawn', { playerId, attackerID });
         } else {
           delete backEndProjectiles[id];
-          backEndPlayers[playerId].health -= 1; // reduce player health by 1 hit point
+          backEndPlayers[playerId].health -= backEndPlayer.weapon[backEndPlayer.level].damage; // reduce player health by 1 hit point
           io.emit('playerHit', { playerId, attackerID });
         }
 
@@ -186,7 +209,6 @@ setInterval(() => {
       }
     }
   }
-
   io.emit('updateProjectiles', backEndProjectiles);
   io.emit('updatePlayers', backEndPlayers);
 }, 15)

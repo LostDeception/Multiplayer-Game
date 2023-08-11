@@ -1,70 +1,76 @@
 class Player {
-  constructor({id, x, y, radius, color, username, weapon}) {
+  constructor({id, x, y, radius, color, username, level, weapon}) {
     this.id = id
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
     this.username = username
+    this.level = level;
     this.weapon = weapon;
+    this.weaponImage = new Image();
   }
 
   draw() {
 
-    c.font = '12px sans-serif'
-    c.fillStyle = this.color
-    c.fillText(this.username, this.x, this.y + 30)
+    // ensure player object has been created before drawing
+    if(frontEndPlayers[this.id]) {
 
-    // draw player healthbar
-    this.draw_healthbar(this.x + 25, this.y + 35, frontEndPlayers[this.id].health, 50, 5);
-
-    c.save();
-    c.shadowColor = this.color;
-    c.shadowBlur = 10;
-    
-
-    // create body
-    c.beginPath()
-
-    c.arc(
-    this.x, 
-    this.y, 
-    this.radius, 
-    0, 
-    Math.PI * 2, 
-    false)
-   
-    c.fillStyle = this.color
-    c.closePath();
-    c.fill()
-
-    // draw weapon on player at mouse rotation
-    var weapon = frontEndPlayers[this.id].weapon.CurrentLevel();
-    var weaponImage = weapon.standardImage();
-    var weaponWidth = weapon.width;
-    var weaponHeight = weapon.height;
-
-    var drawImgX = this.x - (weaponWidth / 2);
-    var drawImgY = this.y - (weaponHeight / 2);
-    var angle = frontEndPlayers[this.id].aimAngle;
-
-    c.translate(drawImgX + weaponWidth / 2, drawImgY + weaponHeight / 2);
-    c.rotate(angle);
-    c.translate(-drawImgX - weaponWidth / 2, -drawImgY - weaponHeight / 2);
-
-
-    if(angle < -1.5 || angle > 1.5) {
-      weaponImage = weapon.flippedImage();
-      drawImgX -= weapon.altPosX;
-      drawImgY -= weapon.altPosY;
-    } else {
-      drawImgX += weapon.altPosX;
-      drawImgY += weapon.altPosY;
+      c.font = '12px sans-serif'
+      c.fillStyle = this.color
+      c.fillText(this.username, this.x, this.y + 30)
+  
+      // draw player healthbar
+      this.draw_healthbar(this.x + 25, this.y + 35, frontEndPlayers[this.id].health, 50, 5);
+  
+      c.save();
+      c.shadowColor = this.color;
+      c.shadowBlur = 10;
+      
+  
+      // create body
+      c.beginPath()
+  
+      c.arc(
+      this.x, 
+      this.y, 
+      this.radius, 
+      0, 
+      Math.PI * 2, 
+      false)
+     
+      c.fillStyle = this.color
+      c.closePath();
+      c.fill()
+  
+      // draw weapon on player at mouse rotation
+      var updatedWeapon = this.getPlayerWeapon();
+      this.weaponImage.src = updatedWeapon.standardImage;
+      var weaponWidth = 60;
+      var weaponHeight = 25;
+  
+      var drawImgX = this.x - (weaponWidth / 2);
+      var drawImgY = this.y - (weaponHeight / 2);
+      var angle = frontEndPlayers[this.id].aimAngle;
+  
+      c.translate(drawImgX + weaponWidth / 2, drawImgY + weaponHeight / 2);
+      c.rotate(angle);
+      c.translate(-drawImgX - weaponWidth / 2, -drawImgY - weaponHeight / 2);
+  
+  
+      if(angle < -1.5 || angle > 1.5) {
+        this.weaponImage.src = updatedWeapon.flippedImage;
+        drawImgX -= updatedWeapon.altPosX;
+        drawImgY -= updatedWeapon.altPosY;
+      } else {
+        drawImgX += updatedWeapon.altPosX;
+        drawImgY += updatedWeapon.altPosY;
+      }
+  
+      // draw player weapon
+      c.drawImage(this.weaponImage, drawImgX, drawImgY, weaponWidth, weaponHeight);
+      c.restore();
     }
-
-    // draw player weapon
-    c.drawImage(weaponImage, drawImgX, drawImgY, weaponWidth, weaponHeight);
-    c.restore();
   }
 
   draw_healthbar(x, y, per, width, thickness) {
@@ -81,5 +87,9 @@ class Player {
     }
     c.closePath();
     c.fill();
+  }
+
+  getPlayerWeapon() {
+    return this.weapon[this.level];
   }
 }
