@@ -78,7 +78,8 @@ io.on('connection', (socket) => {
           flippedImage: '/resources/assault1_flipped.png',
           altPosX: 0,
           altPosY: 10,
-          damage: 2
+          damage: 2,
+          fireRate: 150
       },
       2: {
           name: 'assault_rifle2',
@@ -87,7 +88,7 @@ io.on('connection', (socket) => {
           altPosX: 0,
           altPosY: 5,
           damage: 2.5,
-          radius: 5
+          fireRate: 140
         }
       }
     }
