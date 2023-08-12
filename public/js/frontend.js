@@ -133,8 +133,8 @@ socket.on('updateProjectiles', (backendProjectiles) => {
 
     if(!frontEndProjectiles[id]) {
       frontEndProjectiles[id] = new Projectile({
-        x: backEndProjectile.x,
-        y: backEndProjectile.y, 
+        x: frontEndPlayers[backEndProjectile.playerId].x,
+        y: frontEndPlayers[backEndProjectile.playerId].y, 
         radius: PROJECTILE_RADIUS, 
         color: frontEndPlayers[backEndProjectile.playerId]?.color, 
         velocity: backEndProjectile.velocity
@@ -180,25 +180,25 @@ setInterval(() => {
   if(keys.w.pressed) {
     sequenceNumber++;
     playerInputs.push({sequenceNumber, dx: 0, dy: -SPEED});
-    //frontEndPlayers[socket.id].y -= SPEED;
+    frontEndPlayers[socket.id].y -= SPEED;
     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber });
   }
   if(keys.a.pressed) {
     sequenceNumber++;
     playerInputs.push({sequenceNumber, dx: -SPEED, dy: 0});
-    //frontEndPlayers[socket.id].x -= SPEED;
+    frontEndPlayers[socket.id].x -= SPEED;
     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber });
   }
   if(keys.s.pressed) { 
     sequenceNumber++;
     playerInputs.push({sequenceNumber, dx: 0, dy: SPEED});
-    //frontEndPlayers[socket.id].y += SPEED;
+    frontEndPlayers[socket.id].y += SPEED;
     socket.emit('keydown', { keycode: 'KeyS', sequenceNumber });
   }
   if(keys.d.pressed) {
     sequenceNumber++;
     playerInputs.push({sequenceNumber, dx: SPEED, dy: 0});
-    //frontEndPlayers[socket.id].x += SPEED;
+    frontEndPlayers[socket.id].x += SPEED;
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber });
   }
 
