@@ -39,9 +39,12 @@ io.on('connection', (socket) => {
   socket.on('shoot', ({x, y, angle}) => {
     projectileId++;
 
+    var backendPlayer = backEndPlayers[socket.id];
+    var weapon = backendPlayer.weapon;
+
     const velocity = {
-      x: Math.cos(angle) * PROJECTILE_SPEED,
-      y: Math.sin(angle) * PROJECTILE_SPEED
+      x: Math.cos(angle) * weapon.speed,
+      y: Math.sin(angle) * weapon.speed
     }
 
     backEndProjectiles[projectileId] = {
@@ -72,24 +75,13 @@ io.on('connection', (socket) => {
       username,
       level: 1,
       weapon: {
-        1: {
-          name: 'assault_rifle1',
-          standardImage: '/resources/assault1.png',
-          flippedImage: '/resources/assault1_flipped.png',
-          altPosX: 0,
-          altPosY: 10,
-          damage: 2,
-          fireRate: 150
-      },
-      2: {
-          name: 'assault_rifle2',
-          standardImage: '/resources/assault2.png',
-          flippedImage: '/resources/assault2_flipped.png',
-          altPosX: 0,
-          altPosY: 5,
-          damage: 2.5,
-          fireRate: 140
-        }
+        standardImage: '/resources/assault1.png',
+        flippedImage: '/resources/assault1_flipped.png',
+        altPosX: 0,
+        altPosY: 5,
+        damage: 5,
+        fireRate: 100,
+        speed: 10
       }
     }
 
@@ -162,6 +154,8 @@ setInterval(() => {
     backEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
 
     let attackerID = backEndProjectiles[id].playerId;
+    let attacker = backEndPlayers[attackerID];
+
     if(
 
       // Handle projectile disposal on the X axis
@@ -191,9 +185,10 @@ setInterval(() => {
         if(backEndPlayer.health <= 0) {
 
           // update attackers level by 1
-          if(backEndPlayers[attackerID]) {
-            if(backEndPlayers[attackerID].level < 2)
-              backEndPlayers[attackerID].level++;
+          if(attacker) { 
+            if(attacker.level < 10) {
+              attacker.level++; 
+            }
           }
 
           backEndPlayers[playerId].x = 1024 * Math.random();
@@ -201,9 +196,22 @@ setInterval(() => {
           backEndPlayers[playerId].health = PLAYER_HEALTH;
           io.emit('respawn', { playerId, attackerID });
         } else {
+          let weapon = attacker.weapon;
+          backEndPlayers[playerId].health -=  weapon.damage; // reduce player health by 1 hit point
+          
+          var impactData = { 
+            playerId, 
+            attackerID,
+            deathParticles: {
+              x: backEndProjectiles[id].x,
+              y: backEndProjectiles[id].y,
+              radius: 1.5,
+              color: 'red'
+            }
+          };
+          io.emit('playerHit', impactData);
+
           delete backEndProjectiles[id];
-          backEndPlayers[playerId].health -= backEndPlayer.weapon[backEndPlayer.level].damage; // reduce player health by 1 hit point
-          io.emit('playerHit', { playerId, attackerID });
         }
 
         break;
@@ -215,6 +223,4 @@ setInterval(() => {
 }, 15)
 
 // listen on http server not express
-server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+server.listen(port);

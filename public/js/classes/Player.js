@@ -44,8 +44,7 @@ class Player {
       c.fill()
   
       // draw weapon on player at mouse rotation
-      var updatedWeapon = this.getPlayerWeapon();
-      this.weaponImage.src = updatedWeapon.standardImage;
+      this.weaponImage.src = this.weapon.standardImage;
       var weaponWidth = 60;
       var weaponHeight = 25;
   
@@ -59,12 +58,12 @@ class Player {
   
   
       if(angle < -1.5 || angle > 1.5) {
-        this.weaponImage.src = updatedWeapon.flippedImage;
-        drawImgX -= updatedWeapon.altPosX;
-        drawImgY -= updatedWeapon.altPosY;
+        this.weaponImage.src = this.weapon.flippedImage;
+        drawImgX -= this.weapon.altPosX;
+        drawImgY -= this.weapon.altPosY;
       } else {
-        drawImgX += updatedWeapon.altPosX;
-        drawImgY += updatedWeapon.altPosY;
+        drawImgX += this.weapon.altPosX;
+        drawImgY += this.weapon.altPosY;
       }
   
       // draw player weapon
@@ -87,9 +86,5 @@ class Player {
     }
     c.closePath();
     c.fill();
-  }
-
-  getPlayerWeapon() {
-    return this.weapon[this.level];
   }
 }

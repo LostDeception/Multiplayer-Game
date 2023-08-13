@@ -1,9 +1,16 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
+
 const socket = io();
 const scoreEl = document.querySelector('#scoreEl')
 const devicePixelRatio = window.devicePixelRatio || 1;
+
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+})
+
 
 canvas.width = 1024 * devicePixelRatio;
 canvas.height = 576 * devicePixelRatio;
@@ -13,6 +20,9 @@ const y = canvas.height / 2
 
 const frontEndPlayers = {};
 const frontEndProjectiles = {};
+
+const projectiles = []
+const particles = []
 
 var MOUSE_POS = {
   x: 0,
@@ -24,8 +34,15 @@ const PROJECTILE_RADIUS = 5;
 const PLAYER_HEALTH = 60;
 
 // attacker hits player object
-socket.on('playerHit', (playerId, attackerId) => {
-  delete frontEndProjectiles[attackerId];
+socket.on('playerHit', (impactData) => {
+  let dp = impactData.deathParticles;
+  for(var i  = 0; i < 8; i++) {
+    particles.push(new Particle(dp.x, dp.y, dp.radius, dp.color, {
+      x: Math.random() - 0.5,
+      y: Math.random() - 0.5
+    }))
+  }
+  delete frontEndProjectiles[impactData.attackerId];
 })
 
 // player respawn
@@ -131,17 +148,20 @@ socket.on('updateProjectiles', (backendProjectiles) => {
   for (const id in backendProjectiles) {
     const backEndProjectile = backendProjectiles[id];
 
-    if(!frontEndProjectiles[id]) {
-      frontEndProjectiles[id] = new Projectile({
-        x: frontEndPlayers[backEndProjectile.playerId].x,
-        y: frontEndPlayers[backEndProjectile.playerId].y, 
-        radius: PROJECTILE_RADIUS, 
-        color: frontEndPlayers[backEndProjectile.playerId]?.color, 
-        velocity: backEndProjectile.velocity
-      })
-    } else {
-      frontEndProjectiles[id].x += backendProjectiles[id].velocity.x;
-      frontEndProjectiles[id].y += backendProjectiles[id].velocity.y;
+    // check that frontend player exists
+    if(frontEndPlayers[backEndProjectile.playerId]) {
+      if(!frontEndProjectiles[id]) {
+        frontEndProjectiles[id] = new Projectile({
+          x: frontEndPlayers[backEndProjectile.playerId].x,
+          y: frontEndPlayers[backEndProjectile.playerId].y, 
+          radius: PROJECTILE_RADIUS, 
+          color: frontEndPlayers[backEndProjectile.playerId]?.color, 
+          velocity: backEndProjectile.velocity
+        })
+      } else if(frontEndProjectiles[id]) {
+        frontEndProjectiles[id].x += backendProjectiles[id].velocity.x;
+        frontEndProjectiles[id].y += backendProjectiles[id].velocity.y;
+      }
     }
   }
 
@@ -151,9 +171,6 @@ socket.on('updateProjectiles', (backendProjectiles) => {
     }
   }
 })
-
-const projectiles = []
-const particles = []
 
 
 // ========= PLAYER MOVEMENT =========
@@ -204,7 +221,6 @@ setInterval(() => {
 
   // send player angle to backend
   socket.emit('aim', MOUSE_POS.angle);
-
 }, 15);
 
 window.addEventListener('keydown', (e) => {
@@ -260,18 +276,6 @@ function animate() {
   animationId = requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height);
 
-  for(const id in frontEndPlayers) {
-    const frontEndPlayer = frontEndPlayers[id];
-
-    // linear interpolation
-    if(frontEndPlayer.target) {
-      frontEndPlayers[id].x += (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5;
-      frontEndPlayers[id].y += (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
-    }
-
-    frontEndPlayer.draw();
-  }
-
   for(const id in frontEndProjectiles) {
     const frontEndProjectile = frontEndProjectiles[id];
     frontEndProjectile.draw();
@@ -302,6 +306,18 @@ function animate() {
       projectiles.splice(index, 1)
     }
   }
+
+  for(const id in frontEndPlayers) {
+    const frontEndPlayer = frontEndPlayers[id];
+
+    // linear interpolation
+    if(frontEndPlayer.target) {
+      frontEndPlayers[id].x += (frontEndPlayers[id].target.x - frontEndPlayers[id].x) * 0.5;
+      frontEndPlayers[id].y += (frontEndPlayers[id].target.y - frontEndPlayers[id].y) * 0.5;
+    }
+
+    frontEndPlayer.draw();
+  }
 }
 
 animate()
@@ -310,9 +326,4 @@ function generateImage(src) {
   var img = new Image();
   img.src = src;
   return img;
-}
-
-function getWeaponLevel(id) {
-  let level = frontEndPlayers[id].level;
-  return frontEndPlayers[id].weapon[level];
 }
