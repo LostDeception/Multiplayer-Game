@@ -17,22 +17,25 @@ addEventListener('mousemove', (event) => {
 })
 
 var intervalId;
-$(window).mousedown(function() {
-    if(frontEndPlayers[socket.id]) {
-        let frontEndPlayer = frontEndPlayers[socket.id];
-        let level = frontEndPlayer.level;
-        let fireRate = frontEndPlayer.weapon[level].fireRate;
+$(window).mousedown(function(e) {
 
-        (function ShootWeapon() {
+    // ensure that user is left clicking
+    if(e.button == 0) {
+        if(frontEndPlayers[socket.id]) {
+            let frontEndPlayer = frontEndPlayers[socket.id];
+            let fireRate = frontEndPlayer.weapon.fireRate;
+    
+            (function ShootWeapon() {
+                
+                socket.emit('shoot', {
+                    x: MOUSE_POS.x,
+                    y: MOUSE_POS.y,
+                    angle: MOUSE_POS.angle
+                })
             
-            socket.emit('shoot', {
-                x: MOUSE_POS.x,
-                y: MOUSE_POS.y,
-                angle: MOUSE_POS.angle
-            })
-        
-            intervalId = setTimeout(ShootWeapon, fireRate);
-        })();
+                intervalId = setTimeout(ShootWeapon, fireRate);
+            })();
+        }
     }
 }).mouseup(function() {
   clearInterval(intervalId);
