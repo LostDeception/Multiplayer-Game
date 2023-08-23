@@ -1,12 +1,13 @@
 const friction = 0.99
 class Particle {
-  constructor(x, y, radius, color, velocity) {
+  constructor(type, x, y, radius, color, alpha, velocity) {
+    this.type = type
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
     this.velocity = velocity
-    this.alpha = 1
+    this.alpha = alpha
   }
 
   draw() {
@@ -20,11 +21,17 @@ class Particle {
   }
 
   update() {
-    this.draw()
-    this.velocity.x *= friction
-    this.velocity.y *= friction
-    this.x = this.x + this.velocity.x
-    this.y = this.y + this.velocity.y
-    this.alpha -= 0.01
+
+    this.draw();
+
+
+    // if particle will have a velocity
+    if(this.velocity) {
+      this.velocity.x *= friction
+      this.velocity.y *= friction
+      this.x = this.x + this.velocity.x
+      this.y = this.y + this.velocity.y
+      this.alpha -= 0.007
+    }
   }
 }

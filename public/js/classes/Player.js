@@ -16,13 +16,25 @@ class Player {
     // ensure player object has been created before drawing
     if(frontEndPlayers[this.id]) {
 
+      // player usename
       c.font = '12px sans-serif'
       c.fillStyle = this.color
       c.fillText(this.username, this.x, this.y + 30)
+
+      // player level
+      c.font = '15px sans-serif'
+      c.fillStyle = this.color
+      let textSpace = 15;
+      if(this.level >= 10 && this.level < 100) {
+        textSpace = 25;
+      } else if(this.level >= 100) {
+        textSpace = 30;
+      }
+      c.fillText(this.level, this.x - textSpace, this.y + 35)
   
       // draw player healthbar
       this.draw_healthbar(this.x + 25, this.y + 35, frontEndPlayers[this.id].health, 50, 5);
-  
+
       c.save();
       c.shadowColor = this.color;
       c.shadowBlur = 10;

@@ -7,6 +7,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    background-color: rgb(255, 255, 255);
 }
 
 
@@ -17,32 +19,10 @@ input::placeholder {
 canvas {
     width: 1024px;
     height: 576px;
-    background-image: url('./resources/footer_lodyas.png');
-    border: 3px solid rgb(29, 29, 29);
+    background-color: rgb(15, 15, 15);
+    border: 3px solid rgb(66, 248, 172);
     border-radius: 5px;
 }
-
-#leaderboard {
-    width: 100px;
-    height: 125px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    border-bottom-right-radius: 10px;
-    user-select: none;
-}
-#leaderboard i {
-    margin: 10px 0px 0px 5px;
-    color: gold;
-}
-#leaderboard ul {
-    margin: 10px 0 0 0;
-    padding: 5px 0px 0px 5px;
-    color: white;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
 
 /* Username & Start */
 #initFormContainer {
@@ -57,7 +37,7 @@ canvas {
 }
 #usernameInput {
     padding: 12px;
-    border-radius: 20px;
+    border-radius: 10px;
     border: none;
     background: #475569;
     color: #cbd5e1;

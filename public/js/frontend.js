@@ -6,12 +6,6 @@ const socket = io();
 const scoreEl = document.querySelector('#scoreEl')
 const devicePixelRatio = window.devicePixelRatio || 1;
 
-window.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-})
-
-
 canvas.width = 1024 * devicePixelRatio;
 canvas.height = 576 * devicePixelRatio;
 c.scale(devicePixelRatio, devicePixelRatio);
@@ -33,11 +27,26 @@ var MOUSE_POS = {
 const PROJECTILE_RADIUS = 5;
 const PLAYER_HEALTH = 60;
 
+
+// update canvas background!!!!
+var bgroundX = 30;
+var bgroundY = 20;
+for(var by = 0; by < 41; by++) {
+  for(var bx = 0; bx < 41; bx++) {
+    particles.push(new Particle('background', bgroundX, bgroundY, 3, 'pink', 0.5))
+    bgroundX += 30;
+  }
+
+  bgroundX = 30;
+  bgroundY += 30;
+}
+
+
 // attacker hits player object
 socket.on('playerHit', (impactData) => {
   let dp = impactData.deathParticles;
-  for(var i  = 0; i < 8; i++) {
-    particles.push(new Particle(dp.x, dp.y, dp.radius, dp.color, {
+  for(var i  = 0; i < 10; i++) {
+    particles.push(new Particle('blood', dp.x, dp.y, dp.radius, dp.color, 1, {
       x: Math.random() - 0.5,
       y: Math.random() - 0.5
     }))
@@ -68,11 +77,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         level: backEndPlayer.level,
         weapon: backEndPlayer.weapon
       })
-
-      // if player has not yet been added to leaderboard
-      if(!document.querySelector(`li[data-id="${id}"]`)) {
-        document.querySelector('#leaderboardPlayers').innerHTML += `<li data-id="${id}" data-score="${backEndPlayer.level}">${backEndPlayer.username}: ${backEndPlayer.level}</li>`
-      }
 
     } else {
 
@@ -108,37 +112,12 @@ socket.on('updatePlayers', (backEndPlayers) => {
           frontEndPlayers[id].target.y += input.dy;
         })
       }
-
-      // Update player score to leaderboard
-      document.querySelector(`li[data-id="${id}"]`).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.level}`;
-      document.querySelector(`li[data-id="${id}"]`).setAttribute('data-score', backEndPlayer.level);
-
-      // sorts the player leaderboard list
-      const leaderboardList = document.querySelector('#leaderboardPlayers');
-      const listItems = Array.from(leaderboardList.querySelectorAll('li'));
-      listItems.sort((a, b) => {
-        const scoreA = Number(a.getAttribute('data-score'));
-        const scoreB = Number(b.getAttribute('data-score'));
-        return scoreB - scoreA;
-      })
-
-      // Remove old elements
-      listItems.forEach((li) => {
-        leaderboardList.removeChild(li);
-      })
-
-      // Add sorted elements
-      listItems.forEach((li) => {
-        leaderboardList.appendChild(li);
-      })
     }
   }
 
   // this is where we delete front end players
   for(const id in frontEndPlayers) {
     if(!backEndPlayers[id]) {
-      const liToDelete = document.querySelector(`li[data-id="${id}"]`);
-      liToDelete.parentNode.removeChild(liToDelete);
       delete frontEndPlayers[id];
     }
   }
@@ -238,6 +217,9 @@ window.addEventListener('keydown', (e) => {
     case 'KeyD':
       keys.d.pressed = true;
       break;
+    case 'Tab':
+      e.preventDefault();
+      break;
   }
 })
 
@@ -255,6 +237,9 @@ window.addEventListener('keyup', (e) => {
       break;
     case 'KeyD':
       keys.d.pressed = false;
+      break;
+    case 'Tab':
+      e.preventDefault();
       break;
   }
 })
@@ -276,21 +261,14 @@ function animate() {
   animationId = requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height);
 
+
+  // update projectiles
   for(const id in frontEndProjectiles) {
     const frontEndProjectile = frontEndProjectiles[id];
     frontEndProjectile.draw();
   }
 
-  for (let index = particles.length - 1; index >= 0; index--) {
-    const particle = particles[index]
-
-    if (particle.alpha <= 0) {
-      particles.splice(index, 1)
-    } else {
-      particle.update()
-    }
-  }
-
+  // remove projectiles at end of screen
   for (let index = projectiles.length - 1; index >= 0; index--) {
     const projectile = projectiles[index]
 
@@ -307,6 +285,7 @@ function animate() {
     }
   }
 
+  // update frontend player movement
   for(const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id];
 

@@ -186,9 +186,7 @@ setInterval(() => {
 
           // update attackers level by 1
           if(attacker) { 
-            if(attacker.level < 10) {
-              attacker.level++; 
-            }
+            attacker.level++; 
           }
 
           backEndPlayers[playerId].x = 1024 * Math.random();
@@ -205,8 +203,8 @@ setInterval(() => {
             deathParticles: {
               x: backEndProjectiles[id].x,
               y: backEndProjectiles[id].y,
-              radius: 1.5,
-              color: 'red'
+              radius: 1.8,
+              color: backEndPlayers[playerId].color
             }
           };
           io.emit('playerHit', impactData);

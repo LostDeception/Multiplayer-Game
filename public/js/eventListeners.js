@@ -41,3 +41,8 @@ $(window).mousedown(function(e) {
   clearInterval(intervalId);
 });
 
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+})
+
