@@ -1,3 +1,1 @@
-This is a starter project for the [Chris Courses Online Multiplayer Game Tutorial](https://www.youtube.com/watch?v=Wcvqnx14cZA) available on YouTube.
-
-To get started, download this repo and double click `index.html` to see the single-player game we'll base our multiplayer-game off of.
+Engage in thrilling multiplayer battles with friends or random opponents online in this browser-based arcade shooter. Utilizing advanced client-side prediction technology, the gameplay experience is heightened, ensuring seamless and intense action. Test your skills and reflexes in fast-paced combat scenarios, where every second counts and strategic maneuvers can turn the tide of battle. Get ready for adrenaline-pumping excitement and epic showdowns!
