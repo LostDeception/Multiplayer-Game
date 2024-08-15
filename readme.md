@@ -2,8 +2,6 @@
 
 Welcome to **Arena Shooter**, an online browser-based game where players battle it out in a fast-paced arena! This project showcases the integration of modern web technologies to create a fun and engaging gaming experience.
 
-[add image]
-
 ## 🚀 Features
 
 - **Multiplayer Battles:** Jump into the action and compete against other players in real-time.
