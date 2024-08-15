@@ -31,8 +31,6 @@ Welcome to **Arena Shooter**, an online browser-based game where players battle 
 2. **Enter Your Name:** Type in your player name to get started.
 3. **Engage in a Good Time:** Jump into the arena and enjoy the fast-paced, thrilling gameplay!
 
-[add image]
-
 ## 📸 Screenshots
 
 ![image](https://github.com/user-attachments/assets/c7711874-f099-4ead-9ae7-daeed8633781)
@@ -41,7 +39,3 @@ Welcome to **Arena Shooter**, an online browser-based game where players battle 
 ## 🌍 Live Demo
 
 Check out the live version of the game [here](http://www.sphere-wars.net).
-
----
-
-This version of the README accurately reflects the current features of your game, making it clear and straightforward for anyone visiting the repository.
